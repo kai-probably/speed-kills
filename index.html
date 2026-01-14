@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Speed & Efficiency Mockup (100 km)</title>
+  <title>Speed & Efficiency Explorer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
       --winwin: #22c55e;   /* green */
@@ -210,7 +211,7 @@
 </head>
 <body>
 <div class="container">
-  <h1>Speed vs Time & Fuel</h1>
+  <h1>Speed &amp; Efficiency Explorer</h1>
   <div class="sub">
     Drag the slider to see how your <strong>speed</strong> affects
     <strong>minutes per 100 km</strong>, how far you are from the
@@ -273,10 +274,11 @@
 
     <div class="card">
       <div class="card-header">
-        <span class="card-icon">🎯</span>
+        <span class="card-icon">⏳</span>
         <span class="card-label">Time vs ideal 93.7 km/h</span>
       </div>
       <div id="deltaIdeal" class="card-value">0.0 min</div>
+      <div id="deltaStep" class="card-sub">Next +10 km/h saves: −0.0 min</div>
       <div class="card-sub">Minutes gained or lost over 100 km vs the ideal speed.</div>
     </div>
 
@@ -314,6 +316,7 @@
 
   const timePer100El = document.getElementById('timePer100');
   const deltaIdealEl = document.getElementById('deltaIdeal');
+  const deltaStepEl = document.getElementById('deltaStep');
   const fuelPer100El = document.getElementById('fuelPer100');
   const zoneInfoEl = document.getElementById('zoneInfo');
 
@@ -361,6 +364,24 @@
     const absIdeal = Math.abs(deltaIdeal);
     deltaIdealEl.textContent = `${sign}${absIdeal.toFixed(1)} min`;
 
+    // Delta vs next +10 km/h (per 100 km): t(next) - t(current)
+    const nextV = Math.min(v + 10, FAST_SPEED);
+    let deltaStep = 0;
+    if (nextV > v) {
+      const t100Next = 6000 / nextV;
+      deltaStep = t100Next - t100; // negative if faster helps
+    }
+    let signStep;
+    if (deltaStep < -0.05) {
+      signStep = '−';
+    } else if (deltaStep > 0.05) {
+      signStep = '+';
+    } else {
+      signStep = '±';
+    }
+    const absStep = Math.abs(deltaStep);
+    deltaStepEl.textContent = `Next +10 km/h saves: ${signStep}${absStep.toFixed(1)} min`;
+
     // Fuel consumption model (L/100 km)
     const fuel = c1 + c2 * v + c3 * v * v * v;
     fuelPer100El.textContent = fuel.toFixed(2) + ' L/100 km';
@@ -377,18 +398,15 @@
     // Color code the bar based on remaining potential
     let color;
     if (potentialPercent > 60) {
-      // lots of benefit left: vivid green
-      color = '#22c55e';
+      color = '#22c55e';      // lots of benefit left: vivid green
     } else if (potentialPercent > 30) {
-      // medium: amber-ish
-      color = '#f59e0b';
+      color = '#f59e0b';      // medium: amber
     } else {
-      // almost nothing left: dull gray
-      color = '#9ca3af';
+      color = '#f97373';      // almost nothing left: soft red
     }
     potentialBarEl.style.backgroundColor = color;
 
-    // Zone labeling (same as before)
+    // Zone labeling
     let zoneLabel = 'Outside optimized zone';
     let dotColor = '#9ca3af';
     zoneInfoEl.className = 'zone-pill';
