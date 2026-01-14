@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Speed & Efficiency Mockup (100 km)</title>
+  <style>
+    :root {
+      --winwin: #22c55e;   /* green */
+      --sweet: #60a5fa;   /* blue */
+      --plateau: #facc15; /* yellow */
+      --risk: #f97373;    /* soft red */
+      --risk-strong: #ef4444; /* darker red */
+      --bg: #f5f7fb;
+      --card-bg: #ffffff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border-subtle: #e5e7eb;
+      --accent: #3b82f6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 1.5rem;
+      background: var(--bg);
+      color: var(--text-main);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 1.5rem 1.5rem 2rem;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin: 0 0 0.5rem;
+    }
+
+    .sub {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .slider-block { margin-bottom: 1.5rem; }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .slider-value { font-weight: 600; }
+
+    .slider-row { margin-bottom: 0.5rem; }
+
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #111827;
+      cursor: pointer;
+      box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.12);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #111827;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.12);
+    }
+
+    .zone-bar {
+      position: relative;
+      display: flex;
+      height: 12px;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      margin-top: 0.4rem;
+    }
+    .zone-seg { height: 100%; }
+
+    .zone-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    .zone-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .zone-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .zone-pill.winwin { background: rgba(34,197,94,0.12); }
+    .zone-pill.sweet { background: rgba(59,130,246,0.12); }
+    .zone-pill.plateau { background: rgba(250,204,21,0.18); }
+    .zone-pill.risk { background: rgba(239,68,68,0.15); }
+    .zone-pill.risk2 { background: rgba(239,68,68,0.25); }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+      margin-top: 1.2rem;
+    }
+
+    @media (max-width: 640px) {
+      .cards { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: #f9fafb;
+      border-radius: 14px;
+      padding: 0.9rem 0.9rem 1rem;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .card-icon { font-size: 1rem; }
+
+    .card-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .card-value {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.15rem;
+    }
+
+    .card-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .card-value.good { color: #16a34a; }
+    .card-value.bad { color: #dc2626; }
+
+    /* Remaining potential bar */
+    .potential-wrapper {
+      margin-top: 0.3rem;
+    }
+
+    .potential-bar-bg {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
+
+    .potential-bar-fill {
+      height: 100%;
+      width: 50%;
+      border-radius: 999px;
+      background: #22c55e;
+      transition: width 0.2s ease-out, background-color 0.2s ease-out;
+    }
+
+    .potential-caption {
+      margin-top: 0.25rem;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Speed vs Time & Fuel</h1>
+  <div class="sub">
+    Drag the slider to see how your <strong>speed</strong> affects
+    <strong>minutes per 100 km</strong>, how far you are from the
+    <strong>ideal 93.7 km/h</strong>, your <strong>fuel consumption</strong>,
+    and how much <strong>speed benefit</strong> is still left to gain.
+  </div>
+
+  <div class="slider-block">
+    <div class="slider-header">
+      <div>Speed</div>
+      <div class="slider-value"><span id="speedLabel">100</span> km/h</div>
+    </div>
+    <div class="slider-row">
+      <input id="speedSlider" type="range" min="30" max="200" step="1" value="100" />
+    </div>
+
+    <!-- Zone bar -->
+    <div class="zone-bar">
+      <!-- 30–50: neutral -->
+      <div class="zone-seg" style="flex:20; background:#e5e7eb;"></div>
+      <!-- 50–80: win–win (green) -->
+      <div class="zone-seg" style="flex:30; background:rgba(34,197,94,0.4);"></div>
+      <!-- 80–100: sweet (blue) -->
+      <div class="zone-seg" style="flex:20; background:rgba(59,130,246,0.4);"></div>
+      <!-- 100–120: plateau (yellow) -->
+      <div class="zone-seg" style="flex:20; background:rgba(250,204,21,0.5);"></div>
+      <!-- 120–140: risk (soft red) -->
+      <div class="zone-seg" style="flex:20; background:rgba(249,115,115,0.6);"></div>
+      <!-- 140–200: strong risk (darker red) -->
+      <div class="zone-seg" style="flex:60; background:rgba(239,68,68,0.8);"></div>
+    </div>
+
+    <div class="zone-labels">
+      <span>30</span>
+      <span>50</span>
+      <span>80</span>
+      <span>100</span>
+      <span>120</span>
+      <span>140</span>
+      <span>200</span>
+    </div>
+
+    <div style="margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.4rem; align-items:center;">
+      <span id="zoneInfo" class="zone-pill">
+        <span class="zone-dot" style="background:#9ca3af;"></span>
+        Outside optimized zone
+      </span>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">⏱️</span>
+        <span class="card-label">Time per 100 km</span>
+      </div>
+      <div id="timePer100" class="card-value">60.0 min</div>
+      <div class="card-sub">How long 100 km takes at this speed.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">🎯</span>
+        <span class="card-label">Time vs ideal 93.7 km/h</span>
+      </div>
+      <div id="deltaIdeal" class="card-value">0.0 min</div>
+      <div class="card-sub">Minutes gained or lost over 100 km vs the ideal speed.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">⛽</span>
+        <span class="card-label">Fuel consumption</span>
+      </div>
+      <div id="fuelPer100" class="card-value">0.00 L/100 km</div>
+      <div class="card-sub">Simplified model with optimum near 80 km/h.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">📉</span>
+        <span class="card-label">Remaining speed benefit</span>
+      </div>
+      <div id="potentialValue" class="card-value">0%</div>
+      <div class="potential-wrapper">
+        <div class="potential-bar-bg">
+          <div id="potentialBar" class="potential-bar-fill"></div>
+        </div>
+        <div class="potential-caption">
+          How much improvement is still possible by going faster
+          (30 km/h = 100%, 200 km/h = 0%).
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const speedSlider = document.getElementById('speedSlider');
+  const speedLabel = document.getElementById('speedLabel');
+
+  const timePer100El = document.getElementById('timePer100');
+  const deltaIdealEl = document.getElementById('deltaIdeal');
+  const fuelPer100El = document.getElementById('fuelPer100');
+  const zoneInfoEl = document.getElementById('zoneInfo');
+
+  const potentialValueEl = document.getElementById('potentialValue');
+  const potentialBarEl = document.getElementById('potentialBar');
+
+  // Fuel model parameters (toy model: minimum around 80 km/h)
+  const c3 = 1e-6;
+  const c2 = -3 * c3 * 80 * 80; // derivative zero at 80 km/h
+  const c1 = 6;
+
+  const IDEAL_SPEED = 93.7; // km/h
+  const t100Ideal = 6000 / IDEAL_SPEED;
+
+  const SLOW_SPEED = 30;
+  const FAST_SPEED = 200;
+  const t100Slow = 6000 / SLOW_SPEED;
+  const t100Fast = 6000 / FAST_SPEED;
+
+  function clamp01(x) {
+    if (x < 0) return 0;
+    if (x > 1) return 1;
+    return x;
+  }
+
+  function updateUI() {
+    const v = parseInt(speedSlider.value, 10);
+    speedLabel.textContent = v;
+
+    // Time per 100 km
+    const t100 = 6000 / v;
+    timePer100El.textContent = t100.toFixed(1) + ' min';
+
+    // Time vs ideal 93.7 km/h (per 100 km)
+    const deltaIdeal = t100 - t100Ideal; // positive = slower than ideal
+    deltaIdealEl.className = 'card-value';
+    let sign = '';
+    if (deltaIdeal > 0.1) {
+      deltaIdealEl.classList.add('bad');
+      sign = '+';
+    } else if (deltaIdeal < -0.1) {
+      deltaIdealEl.classList.add('good');
+      sign = '−';
+    }
+    const absIdeal = Math.abs(deltaIdeal);
+    deltaIdealEl.textContent = `${sign}${absIdeal.toFixed(1)} min`;
+
+    // Fuel consumption model (L/100 km)
+    const fuel = c1 + c2 * v + c3 * v * v * v;
+    fuelPer100El.textContent = fuel.toFixed(2) + ' L/100 km';
+
+    // Remaining speed benefit (normalized)
+    // 30 km/h -> 100%, 200 km/h -> 0%
+    const potentialRaw = (t100 - t100Fast) / (t100Slow - t100Fast);
+    const potential = clamp01(potentialRaw);
+    const potentialPercent = potential * 100;
+
+    potentialValueEl.textContent = `${potentialPercent.toFixed(0)}%`;
+    potentialBarEl.style.width = `${potentialPercent.toFixed(0)}%`;
+
+    // Color code the bar based on remaining potential
+    let color;
+    if (potentialPercent > 60) {
+      // lots of benefit left: vivid green
+      color = '#22c55e';
+    } else if (potentialPercent > 30) {
+      // medium: amber-ish
+      color = '#f59e0b';
+    } else {
+      // almost nothing left: dull gray
+      color = '#9ca3af';
+    }
+    potentialBarEl.style.backgroundColor = color;
+
+    // Zone labeling (same as before)
+    let zoneLabel = 'Outside optimized zone';
+    let dotColor = '#9ca3af';
+    zoneInfoEl.className = 'zone-pill';
+
+    if (v >= 50 && v < 80) {
+      zoneLabel = 'Win–win: faster & more efficient';
+      dotColor = 'var(--winwin)';
+      zoneInfoEl.classList.add('winwin');
+    } else if (v >= 80 && v < 100) {
+      zoneLabel = 'Fuel-efficiency sweet spot';
+      dotColor = 'var(--sweet)';
+      zoneInfoEl.classList.add('sweet');
+    } else if (v >= 100 && v < 120) {
+      zoneLabel = 'Time-efficiency plateau';
+      dotColor = 'var(--plateau)';
+      zoneInfoEl.classList.add('plateau');
+    } else if (v >= 120 && v < 140) {
+      zoneLabel = 'High-speed region (risk rising)';
+      dotColor = 'var(--risk)';
+      zoneInfoEl.classList.add('risk');
+    } else if (v >= 140) {
+      zoneLabel = 'Crash severity increases super-linearly';
+      dotColor = 'var(--risk-strong)';
+      zoneInfoEl.classList.add('risk2');
+    }
+
+    zoneInfoEl.innerHTML = `
+      <span class="zone-dot" style="background:${dotColor};"></span>
+      ${zoneLabel}
+    `;
+  }
+
+  speedSlider.addEventListener('input', updateUI);
+  updateUI();
+</script>
+</body>
+</html>
