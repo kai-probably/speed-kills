@@ -251,7 +251,7 @@
     Drag the slider to see how your <strong>speed</strong> affects
     <strong>minutes per 100 km</strong>, how much the <strong>next 10 km/h</strong>
     still saves, how far you are from the <strong>ideal 93.7 km/h</strong>,
-    your <strong>fuel consumption</strong>, and how much <strong>speed benefit</strong>
+    your <strong>fuel consumption</strong>, and how much <strong>time-saving potential</strong>
     is still left to gain.
   </div>
 
@@ -343,11 +343,11 @@
       </div>
     </div>
 
-    <!-- b) Remaining speed benefit -->
+    <!-- b) Remaining time-saving potential -->
     <div class="card">
       <div class="card-header">
         <span class="card-icon">📉</span>
-        <span class="card-label">Remaining speed benefit</span>
+        <span class="card-label">Remaining time-saving potential</span>
       </div>
       <div id="potentialValue" class="card-value">0%</div>
       <div class="potential-wrapper">
@@ -355,7 +355,7 @@
           <div id="potentialBar" class="potential-bar-fill"></div>
         </div>
         <div class="potential-caption">
-          How much improvement is still possible by going faster
+          How much time-saving improvement is still possible by going faster
           (30 km/h = 100%, 200 km/h = 0%).
         </div>
       </div>
@@ -378,7 +378,7 @@
         <span class="card-label">Travel time per 100 km</span>
       </div>
       <div id="timePer100" class="card-value">60.0 min</div>
-      <div class="card-sub">How long 100 km takes at this speed.</div>
+      <div class="card-sub">Time required to cover 100 km at the selected speed.</div>
     </div>
   </div>
 </div>
@@ -478,7 +478,6 @@
 
     // Time vs ideal 93.7 km/h (per 100 km)
     const deltaIdeal = t100 - t100Ideal; // positive = slower than ideal
-    let signIdeal = '';
     let idealClass = 'card-sub';
     if (deltaIdeal > 0.1) {
       // slower than ideal -> bad
@@ -494,7 +493,6 @@
 
     // Delta vs next 10 km/h (per 100 km)
     const deltaStep = deltaStepPer100(v);
-    let signStep = '';
     let stepClass = 'card-value';
     if (deltaStep < -0.05) {
       // saves time -> good
@@ -526,7 +524,7 @@
     const fuel = c1 + c2 * v + c3 * v * v * v;
     fuelPer100El.textContent = fuel.toFixed(2) + ' L/100 km';
 
-    // Remaining speed benefit (normalized)
+    // Remaining time-saving potential (normalized)
     // 30 km/h -> 100%, 200 km/h -> 0%
     const potentialRaw = (t100 - t100Fast) / (t100Slow - t100Fast);
     const potential = clamp01(potentialRaw);
@@ -538,7 +536,7 @@
     // Color code the bar based on remaining potential (green -> amber -> red)
     let color;
     if (potentialPercent > 60) {
-      color = '#22c55e';      // lots of benefit left: vivid green
+      color = '#22c55e';      // lots of potential left: vivid green
     } else if (potentialPercent > 30) {
       color = '#f59e0b';      // medium: amber
     } else {
