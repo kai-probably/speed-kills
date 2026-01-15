@@ -8,6 +8,7 @@ An interactive model that visualizes how vehicle speed affects:
 
 The goal is to provide a simple, intuitive tool for understanding why *going faster doesn’t always save as much time as people expect*, and why fuel and risk both rise disproportionately at high speeds.
 
+![Diminishing returns graph](images/curve-demo.png)
 ---
 
 ## 🚀 Live Demo (GitHub Pages)
