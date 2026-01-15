@@ -497,10 +497,10 @@
     let signStep = '±';
     let stepClass = 'card-value';
     if (deltaStep < -0.05) {
-      signStep = '−';
+      signStep = '+';
       stepClass += ' good';
     } else if (deltaStep > 0.05) {
-      signStep = '+';
+      signStep = '-';
       stepClass += ' bad';
     }
     const absStep = Math.abs(deltaStep);
