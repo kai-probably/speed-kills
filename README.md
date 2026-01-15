@@ -1,4 +1,4 @@
-# Speed Efficiency Explorer  
+# Speed vs Time: Diminishing Returns
 An interactive model that visualizes how vehicle speed affects:
 - **travel time per 100 km**
 - **fuel consumption**
