@@ -275,8 +275,9 @@
         <line x1="0" y1="36" x2="100" y2="36" stroke="#e5e7eb" stroke-width="0.8" />
         <!-- Curve path -->
         <path id="deltaCurvePath" d="" fill="none" stroke="url(#curveGradient)" stroke-width="1.8" />
-        <!-- Sliding dot -->
-        <circle id="deltaDot" cx="0" cy="36" r="1.8" fill="#22c55e" stroke="#ffffff" stroke-width="0.6" />
+        <!-- Adaptive vertical marker -->
+        <line id="deltaMarker" x1="0" y1="36" x2="0" y2="36"
+              stroke="#111827" stroke-width="1.2" />
       </svg>
     </div>
     <div class="curve-legend">
@@ -396,7 +397,7 @@
   const potentialBarEl = document.getElementById('potentialBar');
 
   const deltaCurvePath = document.getElementById('deltaCurvePath');
-  const deltaDot = document.getElementById('deltaDot');
+  const deltaMarker = document.getElementById('deltaMarker');
 
   // Fuel model parameters (toy model: minimum around 80 km/h)
   const c3 = 1e-6;
@@ -506,17 +507,21 @@
     deltaStepMainEl.className = stepClass;
     deltaStepMainEl.textContent = `${signStep}${absStep.toFixed(1)} min`;
 
-    // Position sliding dot on curve using same scaling as curve
+    // Position adaptive vertical marker on curve
     const xNorm = (v - MIN_SPEED) / (MAX_SPEED - MIN_SPEED);
     const x = xNorm * 100;
     let y = 36;
     if (maxAbsDeltaGlobal > 0) {
       const hNorm = absStep / maxAbsDeltaGlobal;
       const h = hNorm * 34;
-      y = 36 - h;
+      // ensure a minimum height so the line is still visible
+      const yTop = Math.min(36 - Math.max(h, 1), 36);
+      y = yTop;
     }
-    deltaDot.setAttribute('cx', x.toFixed(2));
-    deltaDot.setAttribute('cy', y.toFixed(2));
+    deltaMarker.setAttribute('x1', x.toFixed(2));
+    deltaMarker.setAttribute('x2', x.toFixed(2));
+    deltaMarker.setAttribute('y1', y.toFixed(2));
+    deltaMarker.setAttribute('y2', '36');
 
     // Fuel consumption model (L/100 km)
     const fuel = c1 + c2 * v + c3 * v * v * v;
