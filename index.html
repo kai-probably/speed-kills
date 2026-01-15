@@ -249,7 +249,7 @@
   <h1>Speed &amp; Efficiency Explorer</h1>
   <div class="sub">
     Drag the slider to see how your <strong>speed</strong> affects
-    <strong>minutes per 100 km</strong>, how much the <strong>next +10 km/h</strong>
+    <strong>minutes per 100 km</strong>, how much the <strong>next 10 km/h</strong>
     still saves, how far you are from the <strong>ideal 93.7 km/h</strong>,
     your <strong>fuel consumption</strong>, and how much <strong>speed benefit</strong>
     is still left to gain.
@@ -258,7 +258,7 @@
   <!-- Diminishing returns curve -->
   <div class="curve-block">
     <div class="curve-header">
-      Diminishing returns: time saved by the <strong>next +10 km/h</strong> (per 100 km)
+      Diminishing returns: time saved by the <strong>next 10 km/h</strong> (per 100 km)
     </div>
     <div class="curve-svg-wrapper">
       <svg id="deltaCurveSvg" class="curve-svg" viewBox="0 0 100 40">
@@ -287,7 +287,7 @@
 
   <div class="slider-block">
     <div class="slider-header">
-      <div>Speed</div>
+      <div>Your speed</div>
       <div class="slider-value"><span id="speedLabel">100</span> km/h</div>
     </div>
     <div class="slider-row">
@@ -329,17 +329,17 @@
   </div>
 
   <div class="cards">
-    <!-- a) Time saving from next 10 km/h -->
+    <!-- a) Time saved by next 10 km/h -->
     <div class="card">
       <div class="card-header">
         <span class="card-icon">⏳</span>
         <span class="card-label">Time saved by going 10 km/h faster</span>
       </div>
-      <div id="deltaStepMain" class="card-value">−0.0 min</div>
-      <div class="card-sub">Extra time saved per 100 km by going 10 km/h faster.</div>
+      <div id="deltaStepMain" class="card-value">0.0 min</div>
+      <div class="card-sub">Extra time saved per 100 km if you increase your speed by 10 km/h.</div>
       <div class="card-sub">
         vs ideal 93.7 km/h:
-        <span id="deltaIdealValue"> ±0.0 min / 100 km</span>
+        <span id="deltaIdealValue">0.0 min / 100 km</span>
       </div>
     </div>
 
@@ -368,10 +368,10 @@
         <span class="card-label">Fuel consumption</span>
       </div>
       <div id="fuelPer100" class="card-value">0.00 L/100 km</div>
-      <div class="card-sub">Simplified model with optimum near 80 km/h.</div>
+      <div class="card-sub">Simplified model with a minimum near 80 km/h.</div>
     </div>
 
-    <!-- d) Time per 100 km -->
+    <!-- d) Travel time per 100 km -->
     <div class="card">
       <div class="card-header">
         <span class="card-icon">⏱️</span>
@@ -428,7 +428,7 @@
     if (nextV <= v) return 0;
     const t100 = 6000 / v;
     const t100Next = 6000 / nextV;
-    return t100Next - t100; // negative if faster helps
+    return t100Next - t100; // negative if faster helps (less time)
   }
 
   // Precompute curve path based on deltaStepPer100
@@ -472,40 +472,40 @@
     const v = parseInt(speedSlider.value, 10);
     speedLabel.textContent = v;
 
-    // Time per 100 km
+    // Travel time per 100 km
     const t100 = 6000 / v;
     timePer100El.textContent = t100.toFixed(1) + ' min';
 
     // Time vs ideal 93.7 km/h (per 100 km)
     const deltaIdeal = t100 - t100Ideal; // positive = slower than ideal
-    let signIdeal = '±';
+    let signIdeal = '';
     let idealClass = 'card-sub';
     if (deltaIdeal > 0.1) {
-      signIdeal = '+';
+      // slower than ideal -> bad
       idealClass += ' bad';
     } else if (deltaIdeal < -0.1) {
-      signIdeal = '−';
+      // faster than ideal -> good
       idealClass += ' good';
     }
     const absIdeal = Math.abs(deltaIdeal);
     deltaIdealValueEl.className = idealClass;
     deltaIdealValueEl.textContent =
-      ` ${signIdeal}${absIdeal.toFixed(1)} min / 100 km`;
+      `${absIdeal.toFixed(1)} min / 100 km`;
 
-    // Delta vs next +10 km/h (per 100 km)
+    // Delta vs next 10 km/h (per 100 km)
     const deltaStep = deltaStepPer100(v);
-    let signStep = '±';
+    let signStep = '';
     let stepClass = 'card-value';
     if (deltaStep < -0.05) {
-      signStep = '+';
+      // saves time -> good
       stepClass += ' good';
     } else if (deltaStep > 0.05) {
-      signStep = '-';
+      // loses time -> bad (theoretical at high end)
       stepClass += ' bad';
     }
     const absStep = Math.abs(deltaStep);
     deltaStepMainEl.className = stepClass;
-    deltaStepMainEl.textContent = `${signStep}${absStep.toFixed(1)} min`;
+    deltaStepMainEl.textContent = `${absStep.toFixed(1)} min`;
 
     // Position adaptive vertical marker on curve
     const xNorm = (v - MIN_SPEED) / (MAX_SPEED - MIN_SPEED);
@@ -514,7 +514,6 @@
     if (maxAbsDeltaGlobal > 0) {
       const hNorm = absStep / maxAbsDeltaGlobal;
       const h = hNorm * 34;
-      // ensure a minimum height so the line is still visible
       const yTop = Math.min(36 - Math.max(h, 1), 36);
       y = yTop;
     }
