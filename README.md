@@ -15,7 +15,6 @@ Once GitHub Pages is enabled, the demo will be available here: https://kai-proba
 
 > The linked page will automatically render the interactive HTML prototype included in this repository.
 
----
 
 The project currently runs entirely within the browser – no backend, no build tools, no dependencies.
 
@@ -33,7 +32,7 @@ This makes it very clear how diminishing returns work:
 
 The faster you already are, the less time you can save by going even faster.
 
----
+
 
 ### Remaining Speed Benefit (Potential)
 
@@ -43,7 +42,7 @@ To visualize diminishing returns more intuitively, we normalize “improvement p
 This shows *how much benefit is still available* by going faster.  
 The bar shrinks and changes color as speed increases.
 
----
+
 
 ### Fuel Consumption (Simplified Model)
 
@@ -54,7 +53,7 @@ A lightweight cubic model approximates the typical fuel efficiency curve:
 
 This is not tied to a specific car but reflects general aerodynamic and engine-load behaviors.
 
----
+
 
 ### Driving Zones
 
@@ -74,7 +73,7 @@ The goal is intuitive communication, not preaching.
 
 ## 🛠 Planned Features
 
-The long-term vision:
+The long-term vision: an app
 
 ### Phase 1 — Web Demo Improvements
 - Add “trip distance” slider
@@ -101,20 +100,20 @@ The long-term vision:
 - All calculations are done directly in browser JavaScript.
 - Designed to be self-contained and easy to port into a real frontend app.
 
----
+
 
 ## 💬 Contributing
 
 This is a public, open prototype.  
 Ideas, bug reports, and feature suggestions are welcome via Issues or Pull Requests.
 
----
+
 
 ## 📄 License
 
 This project is licensed under the MIT License – see the LICENSE file for details.
 
----
+
 
 ## 👤 Author
 
