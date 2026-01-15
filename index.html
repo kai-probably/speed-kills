@@ -72,7 +72,7 @@
 
     .curve-svg-wrapper {
       width: 100%;
-      height: 80px;
+      height: 130px;
     }
 
     .curve-svg {
@@ -213,6 +213,9 @@
     .card-value.good { color: #16a34a; }
     .card-value.bad { color: #dc2626; }
 
+    .card-sub.good { color: #16a34a; }
+    .card-sub.bad { color: #dc2626; }
+
     /* Remaining potential bar */
     .potential-wrapper {
       margin-top: 0.3rem;
@@ -258,13 +261,14 @@
       Diminishing returns: time saved by the <strong>next +10 km/h</strong> (per 100 km)
     </div>
     <div class="curve-svg-wrapper">
-      <svg id="deltaCurveSvg" class="curve-svg" viewBox="0 0 100 40" preserveAspectRatio="none">
+      <svg id="deltaCurveSvg" class="curve-svg" viewBox="0 0 100 40">
         <defs>
-          <!-- Subtle green-to-gray gradient for the curve -->
+          <!-- Green -> yellow-green -> soft red -->
           <linearGradient id="curveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stop-color="#22c55e" />
-            <stop offset="50%" stop-color="#a3e635" />
-            <stop offset="100%" stop-color="#9ca3af" />
+            <stop offset="45%" stop-color="#4ade80" />
+            <stop offset="75%" stop-color="#facc15" />
+            <stop offset="100%" stop-color="#f97373" />
           </linearGradient>
         </defs>
         <!-- Baseline -->
@@ -272,7 +276,7 @@
         <!-- Curve path -->
         <path id="deltaCurvePath" d="" fill="none" stroke="url(#curveGradient)" stroke-width="1.8" />
         <!-- Sliding dot -->
-        <circle id="deltaDot" cx="0" cy="36" r="1.6" fill="#22c55e" stroke="#ffffff" stroke-width="0.6" />
+        <circle id="deltaDot" cx="0" cy="36" r="1.8" fill="#22c55e" stroke="#ffffff" stroke-width="0.6" />
       </svg>
     </div>
     <div class="curve-legend">
@@ -324,14 +328,18 @@
   </div>
 
   <div class="cards">
-    <!-- a) Time saved -->
+    <!-- a) Time saving from next 10 km/h -->
     <div class="card">
       <div class="card-header">
         <span class="card-icon">⏳</span>
-        <span class="card-label">Time saved</span>
+        <span class="card-label">Time saving from next +10 km/h</span>
       </div>
-      <div id="deltaStepMain" class="card-value">Next +10 km/h saves: −0.0 min</div>
-      <div id="deltaIdealLine" class="card-sub">vs ideal 93.7 km/h: ±0.0 min / 100 km</div>
+      <div id="deltaStepMain" class="card-value">−0.0 min</div>
+      <div class="card-sub">Extra time saved per 100 km by going 10 km/h faster.</div>
+      <div class="card-sub">
+        vs ideal 93.7 km/h:
+        <span id="deltaIdealValue"> ±0.0 min / 100 km</span>
+      </div>
     </div>
 
     <!-- b) Remaining speed benefit -->
@@ -380,7 +388,7 @@
 
   const timePer100El = document.getElementById('timePer100');
   const deltaStepMainEl = document.getElementById('deltaStepMain');
-  const deltaIdealLineEl = document.getElementById('deltaIdealLine');
+  const deltaIdealValueEl = document.getElementById('deltaIdealValue');
   const fuelPer100El = document.getElementById('fuelPer100');
   const zoneInfoEl = document.getElementById('zoneInfo');
 
@@ -406,6 +414,8 @@
   const MIN_SPEED = 30;
   const MAX_SPEED = 200;
 
+  let maxAbsDeltaGlobal = 0;
+
   function clamp01(x) {
     if (x < 0) return 0;
     if (x > 1) return 1;
@@ -424,16 +434,16 @@
   function buildCurvePath() {
     const samples = [];
     const step = 5; // km/h sampling step
-    let maxAbsDelta = 0;
+    maxAbsDeltaGlobal = 0;
 
     for (let v = MIN_SPEED; v <= MAX_SPEED - 10; v += step) {
       const d = deltaStepPer100(v);
       const absD = Math.abs(d);
-      if (absD > maxAbsDelta) maxAbsDelta = absD;
+      if (absD > maxAbsDeltaGlobal) maxAbsDeltaGlobal = absD;
       samples.push({ v, d });
     }
 
-    if (maxAbsDelta === 0) {
+    if (maxAbsDeltaGlobal === 0) {
       deltaCurvePath.setAttribute('d', '');
       return;
     }
@@ -443,8 +453,8 @@
       const xNorm = (p.v - MIN_SPEED) / (MAX_SPEED - MIN_SPEED); // 0..1
       const x = xNorm * 100;
       const absD = Math.abs(p.d);
-      const hNorm = absD / maxAbsDelta; // 0..1
-      const h = hNorm * 28; // max visual height
+      const hNorm = absD / maxAbsDeltaGlobal; // 0..1
+      const h = hNorm * 34; // max visual height
       const y = 36 - h;     // baseline at 36, grow upwards
 
       if (i === 0) {
@@ -468,52 +478,41 @@
     // Time vs ideal 93.7 km/h (per 100 km)
     const deltaIdeal = t100 - t100Ideal; // positive = slower than ideal
     let signIdeal = '±';
-    if (deltaIdeal > 0.1) signIdeal = '+';
-    else if (deltaIdeal < -0.1) signIdeal = '−';
+    let idealClass = 'card-sub';
+    if (deltaIdeal > 0.1) {
+      signIdeal = '+';
+      idealClass += ' bad';
+    } else if (deltaIdeal < -0.1) {
+      signIdeal = '−';
+      idealClass += ' good';
+    }
     const absIdeal = Math.abs(deltaIdeal);
-    deltaIdealLineEl.textContent =
-      `vs ideal 93.7 km/h: ${signIdeal}${absIdeal.toFixed(1)} min / 100 km`;
+    deltaIdealValueEl.className = idealClass;
+    deltaIdealValueEl.textContent =
+      ` ${signIdeal}${absIdeal.toFixed(1)} min / 100 km`;
 
     // Delta vs next +10 km/h (per 100 km)
     const deltaStep = deltaStepPer100(v);
     let signStep = '±';
-    if (deltaStep < -0.05) signStep = '−';
-    else if (deltaStep > 0.05) signStep = '+';
-    const absStep = Math.abs(deltaStep);
-    deltaStepMainEl.textContent =
-      `Next +10 km/h saves: ${signStep}${absStep.toFixed(1)} min`;
-
-    // Color for time-saved value & dot (green -> amber -> gray-red as savings shrink)
-    let timeColor;
-    if (absStep > 10) {
-      timeColor = '#16a34a'; // strong green
-    } else if (absStep > 5) {
-      timeColor = '#22c55e'; // normal green
-    } else if (absStep > 2) {
-      timeColor = '#a3e635'; // yellow-green
-    } else if (absStep > 1) {
-      timeColor = '#9ca3af'; // grayish
-    } else {
-      timeColor = '#f97373'; // soft red: almost nothing left to gain
+    let stepClass = 'card-value';
+    if (deltaStep < -0.05) {
+      signStep = '−';
+      stepClass += ' good';
+    } else if (deltaStep > 0.05) {
+      signStep = '+';
+      stepClass += ' bad';
     }
-    deltaStepMainEl.style.color = timeColor;
-    deltaDot.setAttribute('fill', timeColor);
+    const absStep = Math.abs(deltaStep);
+    deltaStepMainEl.className = stepClass;
+    deltaStepMainEl.textContent = `${signStep}${absStep.toFixed(1)} min`;
 
-    // Position sliding dot on curve
+    // Position sliding dot on curve using same scaling as curve
     const xNorm = (v - MIN_SPEED) / (MAX_SPEED - MIN_SPEED);
     const x = xNorm * 100;
-    // Approximate same scaling as curve: we need maxAbsDelta again
-    // Recompute quickly:
-    let maxAbsDelta = 0;
-    for (let sv = MIN_SPEED; sv <= MAX_SPEED - 10; sv += 5) {
-      const d = deltaStepPer100(sv);
-      const ad = Math.abs(d);
-      if (ad > maxAbsDelta) maxAbsDelta = ad;
-    }
     let y = 36;
-    if (maxAbsDelta > 0) {
-      const hNorm = absStep / maxAbsDelta;
-      const h = hNorm * 28;
+    if (maxAbsDeltaGlobal > 0) {
+      const hNorm = absStep / maxAbsDeltaGlobal;
+      const h = hNorm * 34;
       y = 36 - h;
     }
     deltaDot.setAttribute('cx', x.toFixed(2));
@@ -532,7 +531,7 @@
     potentialValueEl.textContent = `${potentialPercent.toFixed(0)}%`;
     potentialBarEl.style.width = `${potentialPercent.toFixed(0)}%`;
 
-    // Color code the bar based on remaining potential
+    // Color code the bar based on remaining potential (green -> amber -> red)
     let color;
     if (potentialPercent > 60) {
       color = '#22c55e';      // lots of benefit left: vivid green
