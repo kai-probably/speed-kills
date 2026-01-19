@@ -1,4 +1,4 @@
-# Speed vs Time: Diminishing Returns
+# Speed vs Time: A Diminishing Returns Showcase
 An interactive model that visualizes how vehicle speed affects:
 - **travel time per 100 km**
 - **fuel consumption**
