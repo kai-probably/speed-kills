@@ -16,7 +16,6 @@
       --text-main: #111827;
       --text-muted: #6b7280;
       --border-subtle: #e5e7eb;
-      --accent: #3b82f6;
     }
 
     * { box-sizing: border-box; }
@@ -208,6 +207,7 @@
     .card-sub {
       font-size: 0.75rem;
       color: var(--text-muted);
+      margin-top: 0.1rem;
     }
 
     .card-value.good { color: #16a34a; }
@@ -217,9 +217,7 @@
     .card-sub.bad { color: #dc2626; }
 
     /* Remaining potential bar */
-    .potential-wrapper {
-      margin-top: 0.3rem;
-    }
+    .potential-wrapper { margin-top: 0.3rem; }
 
     .potential-bar-bg {
       width: 100%;
@@ -244,15 +242,13 @@
     }
   </style>
 </head>
+
 <body>
 <div class="container">
   <h1>Speed vs Time: Diminishing Returns</h1>
   <div class="sub">
-    Drag the slider to see how your <strong>speed</strong> affects
-    <strong>minutes per 100 km</strong>, how much the <strong>next 10 km/h</strong>
-    still saves, how far you are from the <strong>ideal 93.7 km/h</strong>,
-    your <strong>fuel consumption</strong>, and how much <strong>time-saving potential</strong>
-    is still left to gain.
+    Speed affects time non-linearly. Distance scales the impact. Fuel costs climb as speed increases
+    (simplified ADAC-style highway model).
   </div>
 
   <!-- Diminishing returns curve -->
@@ -261,9 +257,8 @@
       Diminishing returns: time saved by the <strong>next 10 km/h</strong> (per 100 km)
     </div>
     <div class="curve-svg-wrapper">
-      <svg id="deltaCurveSvg" class="curve-svg" viewBox="0 0 100 40">
+      <svg class="curve-svg" viewBox="0 0 100 40">
         <defs>
-          <!-- Green -> yellow-green -> soft red -->
           <linearGradient id="curveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stop-color="#22c55e" />
             <stop offset="45%" stop-color="#4ade80" />
@@ -271,21 +266,18 @@
             <stop offset="100%" stop-color="#f97373" />
           </linearGradient>
         </defs>
-        <!-- Baseline -->
         <line x1="0" y1="36" x2="100" y2="36" stroke="#e5e7eb" stroke-width="0.8" />
-        <!-- Curve path -->
         <path id="deltaCurvePath" d="" fill="none" stroke="url(#curveGradient)" stroke-width="1.8" />
-        <!-- Adaptive vertical marker -->
-        <line id="deltaMarker" x1="0" y1="36" x2="0" y2="36"
-              stroke="#111827" stroke-width="1.2" />
+        <line id="deltaMarker" x1="0" y1="36" x2="0" y2="36" stroke="#111827" stroke-width="1.2" />
       </svg>
     </div>
     <div class="curve-legend">
-      Left: low speeds, big time savings • Right: high speeds, almost nothing left to gain.
+      The curve is a rate (per 100 km). Distance below scales the totals.
     </div>
   </div>
 
   <div class="slider-block">
+    <!-- Speed -->
     <div class="slider-header">
       <div>Your speed</div>
       <div class="slider-value"><span id="speedLabel">100</span> km/h</div>
@@ -294,30 +286,36 @@
       <input id="speedSlider" type="range" min="30" max="200" step="1" value="100" />
     </div>
 
+    <!-- Distance (new) -->
+    <div class="slider-header" style="margin-top:0.8rem;">
+      <div>Trip distance</div>
+      <div class="slider-value"><span id="distanceLabel">100</span> km</div>
+    </div>
+    <div class="slider-row">
+      <input id="distanceSlider" type="range" min="20" max="500" step="10" value="100" />
+    </div>
+
+    <!-- Fuel price (new) -->
+    <div class="slider-header" style="margin-top:0.8rem;">
+      <div>Fuel price</div>
+      <div class="slider-value">€<span id="fuelPriceLabel">1.70</span> / L</div>
+    </div>
+    <div class="slider-row">
+      <input id="fuelPriceSlider" type="range" min="1.20" max="2.50" step="0.05" value="1.70" />
+    </div>
+
     <!-- Zone bar -->
     <div class="zone-bar">
-      <!-- 30–50: neutral -->
       <div class="zone-seg" style="flex:20; background:#e5e7eb;"></div>
-      <!-- 50–80: win–win (green) -->
       <div class="zone-seg" style="flex:30; background:rgba(34,197,94,0.4);"></div>
-      <!-- 80–100: sweet (blue) -->
       <div class="zone-seg" style="flex:20; background:rgba(59,130,246,0.4);"></div>
-      <!-- 100–120: plateau (yellow) -->
       <div class="zone-seg" style="flex:20; background:rgba(250,204,21,0.5);"></div>
-      <!-- 120–140: risk (soft red) -->
       <div class="zone-seg" style="flex:20; background:rgba(249,115,115,0.6);"></div>
-      <!-- 140–200: strong risk (darker red) -->
       <div class="zone-seg" style="flex:60; background:rgba(239,68,68,0.8);"></div>
     </div>
 
     <div class="zone-labels">
-      <span>30</span>
-      <span>50</span>
-      <span>80</span>
-      <span>100</span>
-      <span>120</span>
-      <span>140</span>
-      <span>200</span>
+      <span>30</span><span>50</span><span>80</span><span>100</span><span>120</span><span>140</span><span>200</span>
     </div>
 
     <div style="margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.4rem; align-items:center;">
@@ -338,6 +336,10 @@
       <div id="deltaStepMain" class="card-value">0.0 min</div>
       <div class="card-sub">Extra time saved per 100 km if you increase your speed by 10 km/h.</div>
       <div class="card-sub">
+        On this trip:
+        <span id="deltaTripValue">0.0 min</span>
+      </div>
+      <div class="card-sub">
         vs ideal 93.7 km/h:
         <span id="deltaIdealValue">0.0 min / 100 km</span>
       </div>
@@ -355,7 +357,7 @@
           <div id="potentialBar" class="potential-bar-fill"></div>
         </div>
         <div class="potential-caption">
-          How much time-saving improvement is still possible by going faster
+          How much improvement is still left in the speed curve
           (30 km/h = 100%, 200 km/h = 0%).
         </div>
       </div>
@@ -368,7 +370,17 @@
         <span class="card-label">Fuel consumption</span>
       </div>
       <div id="fuelPer100" class="card-value">0.00 L/100 km</div>
-      <div class="card-sub">Simplified model with a minimum near 80 km/h.</div>
+      <div class="card-sub">Estimated highway fuel use (ADAC-style simplified model).</div>
+      <div class="card-sub">
+        On this trip:
+        <span id="fuelTripValue">0.00 L</span>
+        ·
+        <span id="fuelTripCost">€0.00</span>
+      </div>
+      <div class="card-sub">
+        Cost per 100 km:
+        <span id="fuelCostPer100">€0.00</span>
+      </div>
     </div>
 
     <!-- d) Travel time per 100 km -->
@@ -379,6 +391,10 @@
       </div>
       <div id="timePer100" class="card-value">60.0 min</div>
       <div class="card-sub">Time required to cover 100 km at the selected speed.</div>
+      <div class="card-sub">
+        Trip duration:
+        <span id="tripDuration">0h 00m</span>
+      </div>
     </div>
   </div>
 </div>
@@ -387,10 +403,24 @@
   const speedSlider = document.getElementById('speedSlider');
   const speedLabel = document.getElementById('speedLabel');
 
+  const distanceSlider = document.getElementById('distanceSlider');
+  const distanceLabel = document.getElementById('distanceLabel');
+
+  const fuelPriceSlider = document.getElementById('fuelPriceSlider');
+  const fuelPriceLabel = document.getElementById('fuelPriceLabel');
+
   const timePer100El = document.getElementById('timePer100');
+  const tripDurationEl = document.getElementById('tripDuration');
+
   const deltaStepMainEl = document.getElementById('deltaStepMain');
+  const deltaTripValueEl = document.getElementById('deltaTripValue');
   const deltaIdealValueEl = document.getElementById('deltaIdealValue');
+
   const fuelPer100El = document.getElementById('fuelPer100');
+  const fuelTripValueEl = document.getElementById('fuelTripValue');
+  const fuelTripCostEl = document.getElementById('fuelTripCost');
+  const fuelCostPer100El = document.getElementById('fuelCostPer100');
+
   const zoneInfoEl = document.getElementById('zoneInfo');
 
   const potentialValueEl = document.getElementById('potentialValue');
@@ -399,21 +429,23 @@
   const deltaCurvePath = document.getElementById('deltaCurvePath');
   const deltaMarker = document.getElementById('deltaMarker');
 
-  // Fuel model parameters (toy model: minimum around 80 km/h)
-  const c3 = 1e-6;
-  const c2 = -3 * c3 * 80 * 80; // derivative zero at 80 km/h
-  const c1 = 6;
-
-  const IDEAL_SPEED = 93.7; // km/h
-  const t100Ideal = 6000 / IDEAL_SPEED;
-
-  const SLOW_SPEED = 30;
-  const FAST_SPEED = 200;
-  const t100Slow = 6000 / SLOW_SPEED;
-  const t100Fast = 6000 / FAST_SPEED;
+  // --- Core constants ---
+  const IDEAL_SPEED = 93.7; // km/h (your earlier “ideal” anchor)
+  const t100Ideal = 6000 / IDEAL_SPEED; // minutes per 100 km
 
   const MIN_SPEED = 30;
   const MAX_SPEED = 200;
+
+  // Potential normalization (same as before)
+  const t100Slow = 6000 / MIN_SPEED;
+  const t100Fast = 6000 / MAX_SPEED;
+
+  // --- Fuel model (German/ADAC-ish) ---
+  // Baseline: 6.5 L/100 km at 100 km/h
+  // Multiplier: 0.55 (rolling/drivetrain) + 0.45 * (v/100)^2 (aero)
+  const FUEL_100 = 6.5;
+  const A_FIXED = 0.55;
+  const A_AERO = 0.45;
 
   let maxAbsDeltaGlobal = 0;
 
@@ -424,14 +456,26 @@
   }
 
   function deltaStepPer100(v) {
-    const nextV = Math.min(v + 10, FAST_SPEED);
+    const nextV = Math.min(v + 10, MAX_SPEED);
     if (nextV <= v) return 0;
     const t100 = 6000 / v;
     const t100Next = 6000 / nextV;
-    return t100Next - t100; // negative if faster helps (less time)
+    return t100Next - t100; // negative = time saved
   }
 
-  // Precompute curve path based on deltaStepPer100
+  function fuelPer100(v) {
+    const ratio = v / 100;
+    const mult = A_FIXED + A_AERO * (ratio * ratio);
+    return FUEL_100 * mult;
+  }
+
+  function formatHoursMinutes(totalMinutes) {
+    const mins = Math.max(0, Math.round(totalMinutes));
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return `${h}h ${String(m).padStart(2, '0')}m`;
+  }
+
   function buildCurvePath() {
     const samples = [];
     const step = 5; // km/h sampling step
@@ -455,14 +499,11 @@
       const x = xNorm * 100;
       const absD = Math.abs(p.d);
       const hNorm = absD / maxAbsDeltaGlobal; // 0..1
-      const h = hNorm * 34; // max visual height
-      const y = 36 - h;     // baseline at 36, grow upwards
+      const h = hNorm * 34;
+      const y = 36 - h;
 
-      if (i === 0) {
-        dAttr += `M ${x.toFixed(2)} ${y.toFixed(2)}`;
-      } else {
-        dAttr += ` L ${x.toFixed(2)} ${y.toFixed(2)}`;
-      }
+      if (i === 0) dAttr += `M ${x.toFixed(2)} ${y.toFixed(2)}`;
+      else dAttr += ` L ${x.toFixed(2)} ${y.toFixed(2)}`;
     });
 
     deltaCurvePath.setAttribute('d', dAttr);
@@ -470,62 +511,76 @@
 
   function updateUI() {
     const v = parseInt(speedSlider.value, 10);
-    speedLabel.textContent = v;
+    const dist = parseInt(distanceSlider.value, 10);
+    const fuelPrice = parseFloat(fuelPriceSlider.value);
 
-    // Travel time per 100 km
+    speedLabel.textContent = v;
+    distanceLabel.textContent = dist;
+    fuelPriceLabel.textContent = fuelPrice.toFixed(2);
+
+    // --- Travel time (rate) ---
     const t100 = 6000 / v;
     timePer100El.textContent = t100.toFixed(1) + ' min';
 
-    // Time vs ideal 93.7 km/h (per 100 km)
+    // Trip duration (scaled)
+    const tripMinutes = t100 * (dist / 100);
+    tripDurationEl.textContent = formatHoursMinutes(tripMinutes);
+
+    // --- Time vs ideal (rate) ---
     const deltaIdeal = t100 - t100Ideal; // positive = slower than ideal
     let idealClass = 'card-sub';
-    if (deltaIdeal > 0.1) {
-      // slower than ideal -> bad
-      idealClass += ' bad';
-    } else if (deltaIdeal < -0.1) {
-      // faster than ideal -> good
-      idealClass += ' good';
-    }
+    if (deltaIdeal > 0.1) idealClass += ' bad';
+    else if (deltaIdeal < -0.1) idealClass += ' good';
+
     const absIdeal = Math.abs(deltaIdeal);
     deltaIdealValueEl.className = idealClass;
-    deltaIdealValueEl.textContent =
-      `${absIdeal.toFixed(1)} min / 100 km`;
+    deltaIdealValueEl.textContent = `${absIdeal.toFixed(1)} min / 100 km`;
 
-    // Delta vs next 10 km/h (per 100 km)
+    // --- Next +10 km/h saving (rate) ---
     const deltaStep = deltaStepPer100(v);
     let stepClass = 'card-value';
-    if (deltaStep < -0.05) {
-      // saves time -> good
-      stepClass += ' good';
-    } else if (deltaStep > 0.05) {
-      // loses time -> bad (theoretical at high end)
-      stepClass += ' bad';
-    }
+    if (deltaStep < -0.05) stepClass += ' good';
+    else if (deltaStep > 0.05) stepClass += ' bad';
+
     const absStep = Math.abs(deltaStep);
     deltaStepMainEl.className = stepClass;
     deltaStepMainEl.textContent = `${absStep.toFixed(1)} min`;
 
-    // Position adaptive vertical marker on curve
+    // Trip-scale saving for next +10 km/h
+    const absTripSave = absStep * (dist / 100);
+    // Color should match the main “rate” classification
+    deltaTripValueEl.className = stepClass.replace('card-value', 'card-sub');
+    deltaTripValueEl.textContent = `${absTripSave.toFixed(1)} min`;
+
+    // --- Curve marker (rate visualization) ---
     const xNorm = (v - MIN_SPEED) / (MAX_SPEED - MIN_SPEED);
     const x = xNorm * 100;
     let y = 36;
+
     if (maxAbsDeltaGlobal > 0) {
       const hNorm = absStep / maxAbsDeltaGlobal;
       const h = hNorm * 34;
-      const yTop = Math.min(36 - Math.max(h, 1), 36);
-      y = yTop;
+      y = Math.min(36 - Math.max(h, 1), 36);
     }
+
     deltaMarker.setAttribute('x1', x.toFixed(2));
     deltaMarker.setAttribute('x2', x.toFixed(2));
     deltaMarker.setAttribute('y1', y.toFixed(2));
     deltaMarker.setAttribute('y2', '36');
 
-    // Fuel consumption model (L/100 km)
-    const fuel = c1 + c2 * v + c3 * v * v * v;
-    fuelPer100El.textContent = fuel.toFixed(2) + ' L/100 km';
+    // --- Fuel (rate + trip totals) ---
+    const f100 = fuelPer100(v);
+    fuelPer100El.textContent = f100.toFixed(2) + ' L/100 km';
 
-    // Remaining time-saving potential (normalized)
-    // 30 km/h -> 100%, 200 km/h -> 0%
+    const tripLiters = f100 * (dist / 100);
+    const tripCost = tripLiters * fuelPrice;
+    const costPer100 = f100 * fuelPrice;
+
+    fuelTripValueEl.textContent = `${tripLiters.toFixed(2)} L`;
+    fuelTripCostEl.textContent = `€${tripCost.toFixed(2)}`;
+    fuelCostPer100El.textContent = `€${costPer100.toFixed(2)}`;
+
+    // --- Remaining time-saving potential (unchanged: speed curve only) ---
     const potentialRaw = (t100 - t100Fast) / (t100Slow - t100Fast);
     const potential = clamp01(potentialRaw);
     const potentialPercent = potential * 100;
@@ -533,18 +588,13 @@
     potentialValueEl.textContent = `${potentialPercent.toFixed(0)}%`;
     potentialBarEl.style.width = `${potentialPercent.toFixed(0)}%`;
 
-    // Color code the bar based on remaining potential (green -> amber -> red)
     let color;
-    if (potentialPercent > 60) {
-      color = '#22c55e';      // lots of potential left: vivid green
-    } else if (potentialPercent > 30) {
-      color = '#f59e0b';      // medium: amber
-    } else {
-      color = '#f97373';      // almost nothing left: soft red
-    }
+    if (potentialPercent > 60) color = '#22c55e';
+    else if (potentialPercent > 30) color = '#f59e0b';
+    else color = '#f97373';
     potentialBarEl.style.backgroundColor = color;
 
-    // Zone labeling
+    // --- Zone labeling (speed regimes) ---
     let zoneLabel = 'Outside optimized zone';
     let dotColor = '#9ca3af';
     zoneInfoEl.className = 'zone-pill';
@@ -577,9 +627,10 @@
     `;
   }
 
-  // Build curve once on load, then hook up slider
   buildCurvePath();
   speedSlider.addEventListener('input', updateUI);
+  distanceSlider.addEventListener('input', updateUI);
+  fuelPriceSlider.addEventListener('input', updateUI);
   updateUI();
 </script>
 </body>
