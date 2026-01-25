@@ -16,7 +16,7 @@ Once GitHub Pages is enabled, the demo will be available here: https://kai-proba
 
 > The linked page will automatically render the interactive HTML prototype included in this repository within the browser – no backend, no build tools, no dependencies.
 
----
+
 
 ![Diminishing returns graph](images/curve-demo.png)
 
