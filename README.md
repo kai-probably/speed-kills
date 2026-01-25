@@ -77,4 +77,4 @@ I used T(v)=6000/v and defined a cut-off where the next +10 km/h stops saving a 
 The *cut-off* is roughly one minute saved per 100 km for the next +10 km/h. 
 Below that, gains shift from minutes to seconds, which I defined as the “not worth it” point.
 
-K.
+♥︎ Kai
