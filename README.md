@@ -12,7 +12,7 @@ The goal is to provide a simple, intuitive tool for understanding why *going fas
 ---
 
 ## 🚀 Live Demo (GitHub Pages)
-Once GitHub Pages is enabled, the demo will be available here: https://kai-probably.github.io/speed-kills/
+Demno runs on GitHub Pages here: https://kai-probably.github.io/speed-kills/
 
 > The linked page will automatically render the interactive HTML prototype included in this repository within the browser – no backend, no build tools, no dependencies.
 
@@ -76,3 +76,5 @@ The speed bar is divided into color-coded zones:
 I used T(v)=6000/v and defined a cut-off where the next +10 km/h stops saving a meaningful amount of time; solving that gives about 93.7 km/h.
 The *cut-off* is roughly one minute saved per 100 km for the next +10 km/h. 
 Below that, gains shift from minutes to seconds, which I defined as the “not worth it” point.
+
+K.
