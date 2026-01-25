@@ -14,10 +14,7 @@ The goal is to provide a simple, intuitive tool for understanding why *going fas
 ## 🚀 Live Demo (GitHub Pages)
 Once GitHub Pages is enabled, the demo will be available here: https://kai-probably.github.io/speed-kills/
 
-> The linked page will automatically render the interactive HTML prototype included in this repository.
-
-
-The project currently runs entirely within the browser – no backend, no build tools, no dependencies.
+> The linked page will automatically render the interactive HTML prototype included in this repository within the browser – no backend, no build tools, no dependencies.
 
 ---
 
@@ -33,7 +30,7 @@ This makes it very clear how diminishing returns work:
 - increasing from 120 → 140 km/h saves **~2 minutes**
 - increasing from 160 → 200 km/h saves **less than 1 minute**
 
-The faster you already are, the less time you can save by going even faster.
+> The faster you already are, the less time you can save by going even faster.
 
 
 
@@ -60,7 +57,7 @@ This is not tied to a specific car but reflects general aerodynamic and engine-l
 
 ### Driving Zones
 
-The speed bar is divided into clear, color-coded zones:
+The speed bar is divided into color-coded zones:
 
 | Speed Range | Zone Description |
 |-------------|------------------|
@@ -70,7 +67,6 @@ The speed bar is divided into clear, color-coded zones:
 | 120–140 km/h | Risk rising |
 | 140–200 km/h | Crash severity increases super-linearly |
 
-The goal is intuitive communication, not preaching.
 
 ---
 
