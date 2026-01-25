@@ -78,4 +78,5 @@ The goal is intuitive communication, not preaching.
 ## TL;DR
 
 I used T(v)=6000/v and defined a cut-off where the next +10 km/h stops saving a meaningful amount of time; solving that gives about 93.7 km/h.
-The cut-off is roughly one minute saved per 100 km for the next +10 km/h — below that, gains shift from minutes to seconds, which I treat as “not worth it.”
+The *cut-off* is roughly one minute saved per 100 km for the next +10 km/h. 
+Below that, gains shift from minutes to seconds, which I defined as the “not worth it” point.
